@@ -37,8 +37,9 @@ npm run dev
 ## TODOs
 - Core: Neural net based search implementation
 - Input: Support for PDF and other document formats
-- UI: Search result visualization
-- UI: Display for similarity scores
+- UI: Fancy search result visualization
+- UI: Better display for similarity scores
+- Deployment: host on the web
 
 ## Tech Stack
 - Frontend: Svelte
@@ -56,10 +57,16 @@ embedded-semantic/               # Root project directory
 │   ├── public/                
 │   │   └── vite.svg          
 │   ├── src/                   
+│   │   ├── App.svelte        # Main Svelte component
+│	│	├── components/
+│	│	│   ├── TextInput.svelte
+│	│	│   ├── FileUpload.svelte
+│	│	│   ├── SearchBox.svelte
+│	│	│   └── SearchResults.svelte
+│   │   ├── lib/              
+│	│	│	└── store.js    # For sharing state between components
 │   │   ├── assets/           
 │   │   │   └── svelte.svg    
-│   │   ├── lib/              
-│   │   ├── App.svelte        # Main Svelte component
 │   │   ├── app.css           
 │   │   ├── main.js           # Entry point
 │   │   └── vite-env.d.ts
