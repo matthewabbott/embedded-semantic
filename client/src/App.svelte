@@ -1,37 +1,36 @@
 <script>
-  import init, { Document } from '../../rust-embedding/pkg/rust_embedding.js';
+  import init, { TfIdfDocument, TfIdfCollection } from '../../rust-embedding/pkg/rust_embedding.js';
   import { onMount } from 'svelte';
 
-  let documents = [];
+  let collection;
   let searchText = '';
+  let searchResults = [];
   let isLoaded = false;
 
   onMount(async () => {
     await init();
+    collection = new TfIdfCollection();
     isLoaded = true;
   });
 
   function handleAddDocument() {
     if (searchText && isLoaded) {
-      const doc = new Document(searchText);
-      documents = [...documents, { text: searchText, doc }];
+      const doc = new TfIdfDocument(searchText);
+      collection.add_document(doc);
       searchText = '';
     }
   }
 
-  function findSimilar(text) {
-    const searchDoc = new Document(text);
-    return documents
-      .map(d => ({
-        text: d.text,
-        similarity: d.doc.similarity(searchDoc)
-      }))
-      .sort((a, b) => b.similarity - a.similarity);
+  function handleSearch() {
+    if (searchText && isLoaded) {
+      const results = collection.search(searchText);
+      searchResults = Array.from(results).sort((a, b) => b.score - a.score);
+    }
   }
 </script>
 
 <main>
-  <h1>Semantic Search Demo</h1>
+  <h1>Semantic Search Demo (TF-IDF)</h1>
   
   {#if isLoaded}
     <div>
@@ -40,18 +39,18 @@
         bind:value={searchText} 
         placeholder="Enter text to add to the collection"
       ></textarea>
-      <button on:click={handleAddDocument}>Add Document</button>
+      <div class="buttons">
+        <button on:click={handleAddDocument}>Add Document</button>
+        <button on:click={handleSearch}>Search</button>
+      </div>
       
-      {#if documents.length > 0}
-        <h2>Documents ({documents.length})</h2>
-        <div class="documents">
-          {#each documents as {text}, i}
-            <div class="document">
-              <p>{text}</p>
-              <button on:click={() => {
-                const similar = findSimilar(text);
-                console.log('Similar documents:', similar);
-              }}>Find Similar</button>
+      {#if searchResults.length > 0}
+        <h2>Search Results</h2>
+        <div class="results">
+          {#each searchResults as result}
+            <div class="result">
+              <p>{result.text}</p>
+              <p class="score">Similarity: {result.score.toFixed(3)}</p>
             </div>
           {/each}
         </div>
@@ -63,12 +62,21 @@
 </main>
 
 <style>
-  .documents {
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .results {
     margin-top: 1rem;
   }
-  .document {
+  .result {
     border: 1px solid #ccc;
     padding: 1rem;
     margin-bottom: 1rem;
+  }
+  .score {
+    color: #666;
+    font-size: 0.9em;
   }
 </style>

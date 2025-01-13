@@ -72,8 +72,14 @@ embedded-semantic/               # Root project directory
 │   └── vite.config.js        # Vite configuration (WASM settings)
 │
 └── rust-embedding/            # Rust/WASM code
-    ├── src/                  
-    │   └── lib.rs            # Rust code for embeddings
+	src/
+	├── lib.rs
+	├── embeddings/
+	│   ├── mod.rs           # Module declarations
+	│   ├── traits.rs        # Shared traits
+	│   └── tf_idf.rs        # TF-IDF implementation
+	└── utils/
+	├	└── mod.rs           # Utility functions
     ├── target/               # (ignored in git) Rust build output
     ├── pkg/                  # (ignored in git) WASM build output
     ├── Cargo.lock           # Rust dependency versions
