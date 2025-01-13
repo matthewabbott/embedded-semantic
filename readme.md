@@ -29,13 +29,13 @@ npm run dev
 ```
 
 ## Current Features
-- Toy embedding (just uses character frequency vectors)
+- TF-IDF search implementation
+- File upload for plaintext files
 - Simple similarity comparison
 - Client-side processing using WASM
 
 ## TODOs
-- Core: Actual embedding algorithm
-- Input: File upload support at all
+- Core: Neural net based search implementation
 - Input: Support for PDF and other document formats
 - UI: Search result visualization
 - UI: Display for similarity scores
@@ -78,8 +78,8 @@ embedded-semantic/               # Root project directory
 	│   ├── mod.rs           # Module declarations
 	│   ├── traits.rs        # Shared traits
 	│   └── tf_idf.rs        # TF-IDF implementation
-	└── utils/
-	├	└── mod.rs           # Utility functions
+	├── utils/
+	│	└── mod.rs           # Utility functions
     ├── target/               # (ignored in git) Rust build output
     ├── pkg/                  # (ignored in git) WASM build output
     ├── Cargo.lock           # Rust dependency versions
