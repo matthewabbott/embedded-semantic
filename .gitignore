@@ -1,0 +1,29 @@
+# Rust/WASM
+/rust-embedding/target/
+/rust-embedding/pkg/
+**/*.rs.bk
+
+# Node/Svelte
+/client/node_modules/
+/client/dist/
+/client/.svelte-kit/
+/client/build/
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Custom (for my own notetaking)
+_*.txt
