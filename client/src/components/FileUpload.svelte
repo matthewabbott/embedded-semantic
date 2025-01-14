@@ -12,9 +12,11 @@
 
     try {
       const text = await file.text();
-	  
+      // Use Rust to chunk the text
+      const chunks = TfIdfDocument.chunk_text(text, 1000); // 1000 chars per chunk
       previewData = {
         content: text,
+        chunks: Array.from(chunks),
         filename: file.name
       };
     } catch (error) {

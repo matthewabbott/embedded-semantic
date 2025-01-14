@@ -8,8 +8,14 @@
                      .filter(chunk => chunk.trim().length > 0)
                      .map(chunk => chunk.trim());
   
-  // Show first 5 chunks in preview
-  let previewChunks = chunks.slice(0, 5);
+  let displayCount = 5;  // Initial number of chunks to display
+
+  $: displayedChunks = chunks.slice(0, displayCount);
+  $: remainingChunks = chunks.length - displayCount;
+
+  function showMoreChunks() {
+    displayCount = Math.min(displayCount + 5, chunks.length);
+  }
 </script>
 
 <div class="preview-modal">
@@ -21,16 +27,16 @@
     </div>
 
     <div class="preview-chunks">
-      {#each previewChunks as chunk, i}
+      {#each displayedChunks as chunk, i}
         <div class="chunk">
           <div class="chunk-header">Chunk {i + 1}</div>
           <div class="chunk-content">{chunk}</div>
         </div>
       {/each}
-      {#if chunks.length > 5}
-        <div class="more-chunks">
-          ... and {chunks.length - 5} more chunks
-        </div>
+      {#if remainingChunks > 0}
+        <button class="show-more" on:click={showMoreChunks}>
+          Show 5 more chunks ({remainingChunks} remaining)
+        </button>
       {/if}
     </div>
 
@@ -144,5 +150,23 @@
 
   button:hover {
     opacity: 0.9;
+  }
+  
+  .show-more {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+  }
+
+  .show-more:hover {
+    background-color: #e8e8e8;
+    color: #333;
   }
 </style>
