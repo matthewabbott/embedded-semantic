@@ -1,20 +1,15 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   export let content = '';
   export let filename = '';
   export let onConfirm;
   export let onCancel;
 
-  let chunks = content.split(/\n\s*\n/)
-                     .filter(chunk => chunk.trim().length > 0)
-                     .map(chunk => chunk.trim());
-  
-  let displayCount = 5;  // Initial number of chunks to display
+  let displayedChunks = [];
+  let breakScores = [];
 
-  $: displayedChunks = chunks.slice(0, displayCount);
-  $: remainingChunks = chunks.length - displayCount;
-
-  function showMoreChunks() {
-    displayCount = Math.min(displayCount + 5, chunks.length);
+  $: {
+    displayedChunks = content.chunks || [];
   }
 </script>
 
@@ -22,22 +17,24 @@
   <div class="preview-content">
     <h3>Preview: {filename}</h3>
     
-    <div class="preview-info">
-      <p>File will be split into {chunks.length} chunks for processing.</p>
+    <div class="chunks-info">
+      <p>File will be split into {displayedChunks.length} chunks based on topic changes.</p>
     </div>
 
     <div class="preview-chunks">
       {#each displayedChunks as chunk, i}
         <div class="chunk">
-          <div class="chunk-header">Chunk {i + 1}</div>
-          <div class="chunk-content">{chunk}</div>
+          <div class="chunk-header">
+            Chunk {i + 1}
+            {#if chunk.breakScore}
+              <span class="break-score">
+                Topic shift score: {chunk.breakScore.toFixed(3)}
+              </span>
+            {/if}
+          </div>
+          <div class="chunk-content">{chunk.text}</div>
         </div>
       {/each}
-      {#if remainingChunks > 0}
-        <button class="show-more" on:click={showMoreChunks}>
-          Show 5 more chunks ({remainingChunks} remaining)
-        </button>
-      {/if}
     </div>
 
     <div class="preview-actions">
@@ -102,6 +99,9 @@
     color: #666;
     font-size: 0.9em;
     font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .chunk-content {
@@ -118,6 +118,11 @@
     font-style: italic;
     background-color: #f8f9fa;
     border-radius: 4px;
+  }
+
+  .break-score {
+    color: #888;
+    font-size: 0.9em;
   }
 
   .preview-actions {

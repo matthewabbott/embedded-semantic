@@ -115,6 +115,8 @@
   on:dragover={handleDragOver}
   on:dragleave={handleDragLeave}
   on:drop={handleDrop}
+  role="region"
+  aria-label="File upload dropzone"
 >
   <h3>Upload File</h3>
   <div class="upload-zone">
