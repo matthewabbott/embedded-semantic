@@ -4,10 +4,12 @@
   export let onConfirm;
   export let onCancel;
 
-  let previewContent = content.slice(0, 1000); // First 1000 chars
-  let totalChunks = content.split(/\n\s*\n/)
-                          .filter(chunk => chunk.trim().length > 0)
-                          .length;
+  let chunks = content.split(/\n\s*\n/)
+                     .filter(chunk => chunk.trim().length > 0)
+                     .map(chunk => chunk.trim());
+  
+  // Show first 5 chunks in preview
+  let previewChunks = chunks.slice(0, 5);
 </script>
 
 <div class="preview-modal">
@@ -15,13 +17,20 @@
     <h3>Preview: {filename}</h3>
     
     <div class="preview-info">
-      <p>File will be split into {totalChunks} chunks for processing.</p>
+      <p>File will be split into {chunks.length} chunks for processing.</p>
     </div>
 
-    <div class="preview-text">
-      {previewContent}
-      {#if content.length > 1000}
-        <span class="truncated">... (content truncated)</span>
+    <div class="preview-chunks">
+      {#each previewChunks as chunk, i}
+        <div class="chunk">
+          <div class="chunk-header">Chunk {i + 1}</div>
+          <div class="chunk-content">{chunk}</div>
+        </div>
+      {/each}
+      {#if chunks.length > 5}
+        <div class="more-chunks">
+          ... and {chunks.length - 5} more chunks
+        </div>
       {/if}
     </div>
 
@@ -54,43 +63,73 @@
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .preview-info {
     margin: 1rem 0;
-    padding: 0.5rem;
-    background-color: #f5f5f5;
+    padding: 0.75rem;
+    background-color: #e8f5e9;
     border-radius: 4px;
+    color: #2e7d32;
   }
 
-  .preview-text {
-    white-space: pre-wrap;
-    font-family: monospace;
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 4px;
-    margin: 1rem 0;
+  .preview-chunks {
+    margin: 1.5rem 0;
     max-height: 400px;
     overflow-y: auto;
+    padding-right: 1rem;
   }
 
-  .truncated {
+  .chunk {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #4CAF50;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .chunk-header {
+    padding: 0.5rem 1rem;
+    background-color: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+    color: #666;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+
+  .chunk-content {
+    padding: 1rem;
+    white-space: pre-wrap;
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  .more-chunks {
+    text-align: center;
+    padding: 1rem;
     color: #666;
     font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 4px;
   }
 
   .preview-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
   }
 
   button {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
   }
 
   .confirm {

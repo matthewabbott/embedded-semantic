@@ -7,8 +7,12 @@
     <h2>Search Results ({results.length})</h2>
     {#each results as result}
       <div class="result">
-        <p class="result-text">{result.text}</p>
-        <p class="score">Similarity: {result.score.toFixed(3)}</p>
+        <div class="document-chunk">
+          <p class="result-text">{result.text}</p>
+        </div>
+        <div class="metadata">
+          <p class="score">Similarity: {result.score.toFixed(3)}</p>
+        </div>
       </div>
     {/each}
   </div>
@@ -20,20 +24,36 @@
   }
 
   .result {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #4CAF50;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
     border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .document-chunk {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .result-text {
     white-space: pre-wrap;
-    margin-bottom: 0.5rem;
+    margin: 0;
+    line-height: 1.5;
+    color: #333;
+    font-size: 1rem;
+  }
+
+  .metadata {
+    margin-top: 0.75rem;
   }
 
   .score {
     color: #666;
     font-size: 0.9em;
     margin: 0;
+    font-weight: 500;
   }
 </style>
