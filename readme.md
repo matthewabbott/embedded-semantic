@@ -87,6 +87,10 @@ embedded-semantic/               # Root project directory
 	│   ├── mod.rs           # Module declarations
 	│   ├── traits.rs        # Shared traits
 	│   └── tf_idf.rs        # TF-IDF implementation
+	├── text_processing/
+	│	├── mod.rs
+	│	├── chunking.rs
+	│	└── utils.rs
 	├── utils/
 	│	└── mod.rs           # Utility functions
     ├── target/               # (ignored in git) Rust build output

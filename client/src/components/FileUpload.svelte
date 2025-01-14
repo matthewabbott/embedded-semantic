@@ -1,6 +1,7 @@
 <script>
   import { collection, uploadStatus } from '../lib/store';
   import { TfIdfDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
+  import { create_semantic_chunks } from '../../../rust-embedding/pkg/rust_embedding.js';
   import FilePreview from './FilePreview.svelte';
 
   let fileInput;
@@ -12,8 +13,8 @@
 
     try {
       const text = await file.text();
-      // Use Rust to chunk the text
-      const chunks = TfIdfDocument.chunk_text(text, 1000); // 1000 chars per chunk
+      // Use semantic chunking with window size of 3 sentences and threshold of 0.3
+      const chunks = create_semantic_chunks(text, 3, 0.3);
       previewData = {
         content: text,
         chunks: Array.from(chunks),

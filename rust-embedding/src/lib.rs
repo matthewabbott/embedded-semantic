@@ -1,9 +1,10 @@
 use wasm_bindgen::prelude::*;
 
 mod embeddings;
+mod text_processing;
 
-// Re-export the types to expose to JavaScript
 pub use embeddings::{TfIdfDocument, TfIdfCollection};
+pub use text_processing::create_semantic_chunks;
 
 // TODO: add a version or init function
 #[wasm_bindgen]
