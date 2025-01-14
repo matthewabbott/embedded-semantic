@@ -1,5 +1,7 @@
 use super::traits::{Document, DenseDocument, DocumentCollection};
+use super::word_vectors::{get_test_vectors, EMBEDDING_SIZE};
 use wasm_bindgen::prelude::*;
+
 
 #[wasm_bindgen]
 pub struct NeuralDocument {
@@ -7,19 +9,39 @@ pub struct NeuralDocument {
     embedding: Vec<f32>,
 }
 
-#[wasm_bindgen]
 impl NeuralDocument {
-    #[wasm_bindgen(constructor)]
-    pub fn create(text: String) -> NeuralDocument {
-        Self::new(text)
+    fn compute_embedding(text: &str) -> Vec<f32> {
+        let word_vectors = get_test_vectors();
+        let mut embedding = vec![0.0; EMBEDDING_SIZE];
+        let mut word_count = 0;
+
+        // Simple averaging of word vectors
+        for word in text.split_whitespace() {
+            if let Some(vector) = word_vectors.get(&word.to_lowercase()) {
+                for (i, &value) in vector.iter().enumerate() {
+                    embedding[i] += value;
+                }
+                word_count += 1;
+            }
+        }
+
+        // Normalize by word count
+        if word_count > 0 {
+            for value in embedding.iter_mut() {
+                *value /= word_count as f32;
+            }
+        }
+
+        embedding
     }
 }
 
 impl Document for NeuralDocument {
     fn new(text: String) -> Self {
+        let embedding = Self::compute_embedding(&text);
         NeuralDocument {
             text,
-            embedding: vec![0.0; 384],
+            embedding,
         }
     }
 
