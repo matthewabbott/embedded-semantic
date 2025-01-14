@@ -3,9 +3,9 @@
   import { TfIdfDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
 
   let fileInput;
+  let dragOver = false;
 
-  async function handleFileUpload(event) {
-    const file = event.target.files[0];
+  async function processFile(file) {
     if (!file) return;
 
     try {
@@ -34,9 +34,6 @@
         documentsAdded: chunks.length
       };
 
-      // Clear the file input
-      fileInput.value = '';
-      
       // Clear status after a delay
       setTimeout(() => {
         if (!$uploadStatus.isUploading) {
@@ -53,16 +50,54 @@
       };
     }
   }
+
+  async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    await processFile(file);
+    fileInput.value = ''; // Clear the file input
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault();
+    dragOver = true;
+  }
+
+  function handleDragLeave() {
+    dragOver = false;
+  }
+
+  async function handleDrop(event) {
+    event.preventDefault();
+    dragOver = false;
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+      await processFile(files[0]);
+    }
+  }
 </script>
 
-<div class="input-section">
+<div 
+  class="input-section"
+  class:drag-over={dragOver}
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
+  on:drop={handleDrop}
+>
   <h3>Upload File</h3>
-  <input 
-    bind:this={fileInput}
-    type="file" 
-    accept=".txt,.md,.csv"
-    on:change={handleFileUpload}
-  />
+  <div class="upload-zone">
+    <input 
+      bind:this={fileInput}
+      type="file" 
+      accept=".txt,.md,.csv"
+      on:change={handleFileUpload}
+      class="file-input"
+    />
+    <div class="upload-message">
+      Drag and drop a file here or click to select
+    </div>
+  </div>
+  
   {#if $uploadStatus.message}
     <div class="status-message" class:error={$uploadStatus.message.includes('Error')}>
       {$uploadStatus.message}
@@ -74,8 +109,39 @@
   .input-section {
     margin-bottom: 2rem;
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 2px dashed #ddd;
     border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .drag-over {
+    border-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+
+  .upload-zone {
+    position: relative;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-message {
+    color: #666;
+    text-align: center;
+    pointer-events: none;
   }
 
   .status-message {
