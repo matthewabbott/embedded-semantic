@@ -1,16 +1,9 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   export let content = '';
+  export let chunks = [];
   export let filename = '';
   export let onConfirm;
   export let onCancel;
-
-  let displayedChunks = [];
-  let breakScores = [];
-
-  $: {
-    displayedChunks = content.chunks || [];
-  }
 </script>
 
 <div class="preview-modal">
@@ -18,17 +11,17 @@
     <h3>Preview: {filename}</h3>
     
     <div class="chunks-info">
-      <p>File will be split into {displayedChunks.length} chunks based on topic changes.</p>
+      <p>File will be split into {chunks.length} chunks based on topic changes.</p>
     </div>
 
     <div class="preview-chunks">
-      {#each displayedChunks as chunk, i}
+      {#each chunks as chunk, i}
         <div class="chunk">
           <div class="chunk-header">
             Chunk {i + 1}
-            {#if chunk.breakScore}
+            {#if chunk.breakScore !== undefined}
               <span class="break-score">
-                Topic shift score: {chunk.breakScore.toFixed(3)}
+                Topic shift score: {Number(chunk.breakScore).toFixed(3)}
               </span>
             {/if}
           </div>

@@ -17,11 +17,12 @@
       const chunks = create_semantic_chunks(text, 3, 0.3);
       previewData = {
         content: text,
-        chunks: Array.from(chunks),
+        chunks: Array.from(chunks), // Convert from JS Array to regular array
         filename: file.name
       };
+      console.log('Chunks created:', previewData.chunks); // Debug log
     } catch (error) {
-      console.error('Error reading file:', error);
+      console.error('Error processing file:', error);
       $uploadStatus = {
         isUploading: false,
         message: 'Error reading file. Please try again.',
@@ -142,6 +143,7 @@
 {#if previewData}
   <FilePreview 
     content={previewData.content}
+    chunks={previewData.chunks}
     filename={previewData.filename}
     onConfirm={handleConfirmUpload}
     onCancel={handleCancelUpload}
