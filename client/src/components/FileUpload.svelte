@@ -1,24 +1,45 @@
 <script>
   import { collection, uploadStatus } from '../lib/store';
   import { TfIdfDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
+  import FilePreview from './FilePreview.svelte';
 
   let fileInput;
   let dragOver = false;
+  let previewData = null;
 
   async function processFile(file) {
     if (!file) return;
 
     try {
+      const text = await file.text();
+	  
+      previewData = {
+        content: text,
+        filename: file.name
+      };
+    } catch (error) {
+      console.error('Error reading file:', error);
+      $uploadStatus = {
+        isUploading: false,
+        message: 'Error reading file. Please try again.',
+        documentsAdded: 0
+      };
+    }
+  }
+
+  async function handleConfirmUpload() {
+    try {
+      const { content, filename } = previewData;
+      
       $uploadStatus = {
         isUploading: true,
-        message: `Reading ${file.name}...`,
+        message: `Processing ${filename}...`,
         documentsAdded: 0
       };
 
-      const text = await file.text();
-      const chunks = text.split(/\n\s*\n/)
-                        .filter(chunk => chunk.trim().length > 0)
-                        .map(chunk => chunk.trim());
+      const chunks = content.split(/\n\s*\n/)
+                          .filter(chunk => chunk.trim().length > 0)
+                          .map(chunk => chunk.trim());
       
       for (const [index, chunk] of chunks.entries()) {
         const doc = new TfIdfDocument(chunk);
@@ -30,9 +51,12 @@
 
       $uploadStatus = {
         isUploading: false,
-        message: `Successfully added ${chunks.length} chunks from ${file.name}`,
+        message: `Successfully added ${chunks.length} chunks from ${filename}`,
         documentsAdded: chunks.length
       };
+
+      // Clear preview
+      previewData = null;
 
       // Clear status after a delay
       setTimeout(() => {
@@ -49,6 +73,11 @@
         documentsAdded: 0
       };
     }
+  }
+
+  function handleCancelUpload() {
+    previewData = null;
+    fileInput.value = '';
   }
 
   async function handleFileUpload(event) {
@@ -104,6 +133,15 @@
     </div>
   {/if}
 </div>
+
+{#if previewData}
+  <FilePreview 
+    content={previewData.content}
+    filename={previewData.filename}
+    onConfirm={handleConfirmUpload}
+    onCancel={handleCancelUpload}
+  />
+{/if}
 
 <style>
   .input-section {

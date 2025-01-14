@@ -39,7 +39,8 @@ npm run dev
 - Input: Support for PDF and other document formats
 - UI: Fancy search result visualization
 - UI: Better display for similarity scores
-- Deployment: host on the web
+- UI: In-browser document navigation, jump to search location
+- Deployment: host on the public web
 
 ## Tech Stack
 - Frontend: Svelte
@@ -61,6 +62,7 @@ embedded-semantic/               # Root project directory
 │	│	├── components/
 │	│	│   ├── TextInput.svelte
 │	│	│   ├── FileUpload.svelte
+│	│	│   ├── FilePreview.svelte
 │	│	│   ├── SearchBox.svelte
 │	│	│   └── SearchResults.svelte
 │   │   ├── lib/              
