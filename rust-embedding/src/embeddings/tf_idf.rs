@@ -1,6 +1,6 @@
+use super::traits::{Document, SparseDocument, DocumentCollection};
 use wasm_bindgen::prelude::*;
 use std::collections::HashMap;
-use super::traits::{Embedding, DocumentCollection};
 
 #[wasm_bindgen]
 pub struct TfIdfDocument {
@@ -12,12 +12,9 @@ pub struct TfIdfDocument {
 #[wasm_bindgen]
 pub struct TfIdfCollection {
     documents: Vec<TfIdfDocument>,
-    document_frequencies: HashMap<String, f32>,
-    total_docs: f32,
 }
 
-// Regular trait implementations (not exposed to WASM)
-impl Embedding for TfIdfDocument {
+impl Document for TfIdfDocument {
     fn new(text: String) -> Self {
         let terms = Self::compute_term_frequencies(&text);
         let magnitude = Self::calculate_magnitude(&terms);
@@ -28,20 +25,19 @@ impl Embedding for TfIdfDocument {
             magnitude,
         }
     }
-	
-	// TODO
+
     fn get_text(&self) -> &str {
         &self.text
     }
 
-	// TODO
-    fn get_vector(&self) -> &HashMap<String, f32> {
-        &self.terms
-    }
-
-	// TODO
     fn get_magnitude(&self) -> f32 {
         self.magnitude
+    }
+}
+
+impl SparseDocument for TfIdfDocument {
+    fn get_sparse_vector(&self) -> &HashMap<String, f32> {
+        &self.terms
     }
 }
 
@@ -50,19 +46,12 @@ impl DocumentCollection for TfIdfCollection {
 
     fn new() -> Self {
         TfIdfCollection {
-            documents: Vec::new(),
-            document_frequencies: HashMap::new(),
-            total_docs: 0.0,
+            documents: Vec::new()
         }
     }
 
     fn add_document(&mut self, doc: Self::Doc) {
-        for term in doc.terms.keys() {
-            *self.document_frequencies.entry(term.clone()).or_insert(0.0) += 1.0;
-        }
-        
         self.documents.push(doc);
-        self.total_docs += 1.0;
     }
 
     fn search(&self, query: String) -> js_sys::Array {
@@ -119,28 +108,22 @@ impl TfIdfCollection {
         Self::new()
     }
 
-    #[wasm_bindgen]
-    pub fn add_document(&mut self, doc: TfIdfDocument) {
-        DocumentCollection::add_document(self, doc)
-    }
-
-    #[wasm_bindgen]
-    pub fn search(&self, query: String) -> js_sys::Array {
-        DocumentCollection::search(self, query)
-    }
-
     fn calculate_similarity(&self, doc1: &TfIdfDocument, doc2: &TfIdfDocument) -> f32 {
-        let mut similarity = 0.0;
-
-        for (term, freq1) in &doc1.terms {
-            if let Some(freq2) = doc2.terms.get(term) {
-                let idf = (self.total_docs / (self.document_frequencies.get(term).unwrap_or(&1.0) + 1.0)).ln();
-                similarity += freq1 * freq2 * idf * idf;
+        let vec1 = doc1.get_sparse_vector();
+        let vec2 = doc2.get_sparse_vector();
+        
+        let mut dot_product = 0.0;
+        for (term, freq1) in vec1 {
+            if let Some(freq2) = vec2.get(term) {
+                dot_product += freq1 * freq2;
             }
         }
 
-        if doc1.magnitude > 0.0 && doc2.magnitude > 0.0 {
-            similarity / (doc1.magnitude * doc2.magnitude)
+        let magnitude1 = doc1.get_magnitude();
+        let magnitude2 = doc2.get_magnitude();
+
+        if magnitude1 > 0.0 && magnitude2 > 0.0 {
+            dot_product / (magnitude1 * magnitude2)
         } else {
             0.0
         }
