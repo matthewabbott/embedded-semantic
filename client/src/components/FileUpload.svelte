@@ -20,6 +20,7 @@
         chunks: Array.from(chunks), // Convert from JS Array to regular array
         filename: file.name
       };
+	  console.log(previewData);
       console.log('Chunks created:', previewData.chunks); // Debug log
     } catch (error) {
       console.error('Error processing file:', error);

@@ -1,5 +1,4 @@
 <script>
-  export let content = '';
   export let chunks = [];
   export let filename = '';
   export let onConfirm;
@@ -62,7 +61,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .preview-info {
+  .chunks-info {
     margin: 1rem 0;
     padding: 0.75rem;
     background-color: #e8f5e9;
@@ -97,25 +96,16 @@
     align-items: center;
   }
 
+  .break-score {
+    color: #888;
+    font-size: 0.9em;
+  }
+
   .chunk-content {
     padding: 1rem;
     white-space: pre-wrap;
     font-family: system-ui, -apple-system, sans-serif;
     line-height: 1.5;
-  }
-
-  .more-chunks {
-    text-align: center;
-    padding: 1rem;
-    color: #666;
-    font-style: italic;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-  }
-
-  .break-score {
-    color: #888;
-    font-size: 0.9em;
   }
 
   .preview-actions {
@@ -148,23 +138,5 @@
 
   button:hover {
     opacity: 0.9;
-  }
-  
-  .show-more {
-    width: 100%;
-    padding: 1rem;
-    margin-top: 1rem;
-    background-color: #f0f0f0;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    color: #666;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: all 0.2s ease;
-  }
-
-  .show-more:hover {
-    background-color: #e8e8e8;
-    color: #333;
   }
 </style>
