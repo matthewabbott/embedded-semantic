@@ -86,7 +86,9 @@ embedded-semantic/               # Root project directory
 	├── embeddings/
 	│   ├── mod.rs           # Module declarations
 	│   ├── traits.rs        # Shared traits
-	│   └── tf_idf.rs        # TF-IDF implementation
+	│   ├── tf_idf.rs        # TF-IDF implementation
+	│   ├── neural.rs
+	│   └── word_vectors.rs
 	├── text_processing/
 	│	├── mod.rs
 	│	├── chunking.rs
