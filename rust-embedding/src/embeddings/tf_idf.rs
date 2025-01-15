@@ -70,7 +70,6 @@ impl DocumentCollection for TfIdfCollection {
     }
 }
 
-// WASM-exposed implementations
 #[wasm_bindgen]
 impl TfIdfDocument {
     #[wasm_bindgen(constructor)]
@@ -106,6 +105,16 @@ impl TfIdfCollection {
     #[wasm_bindgen(constructor)]
     pub fn create() -> TfIdfCollection {
         Self::new()
+    }
+
+    #[wasm_bindgen]
+    pub fn add_document(&mut self, doc: TfIdfDocument) {
+        DocumentCollection::add_document(self, doc)
+    }
+
+    #[wasm_bindgen]
+    pub fn search(&self, query: String) -> js_sys::Array {
+        DocumentCollection::search(self, query)
     }
 
     fn calculate_similarity(&self, doc1: &TfIdfDocument, doc2: &TfIdfDocument) -> f32 {

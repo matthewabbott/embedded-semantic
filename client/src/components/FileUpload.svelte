@@ -1,9 +1,9 @@
 <script>
-  import { collection, uploadStatus } from '../lib/store';
-  import { TfIdfDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
+  import { collection, neuralCollection, searchMode, uploadStatus } from '../lib/store';
+  import { TfIdfDocument, NeuralDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
   import { create_semantic_chunks } from '../../../rust-embedding/pkg/rust_embedding.js';
   import FilePreview from './FilePreview.svelte';
-
+  
   let fileInput;
   let dragOver = false;
   let previewData = null;
@@ -13,17 +13,14 @@
 
     try {
       const text = await file.text();
-      // Use semantic chunking with window size of 3 sentences and threshold of 0.3
       const chunks = create_semantic_chunks(text, 3, 0.3);
       previewData = {
         content: text,
-        chunks: Array.from(chunks), // Convert from JS Array to regular array
+        chunks: Array.from(chunks),
         filename: file.name
       };
-	  console.log(previewData);
-      console.log('Chunks created:', previewData.chunks); // Debug log
     } catch (error) {
-      console.error('Error processing file:', error);
+      console.error('Error reading file:', error);
       $uploadStatus = {
         isUploading: false,
         message: 'Error reading file. Please try again.',
@@ -34,30 +31,29 @@
 
   async function handleConfirmUpload() {
     try {
-      const { content, filename } = previewData;
-      
       $uploadStatus = {
         isUploading: true,
-        message: `Processing ${filename}...`,
+        message: `Processing ${previewData.filename}...`,
         documentsAdded: 0
       };
 
-      const chunks = content.split(/\n\s*\n/)
-                          .filter(chunk => chunk.trim().length > 0)
-                          .map(chunk => chunk.trim());
-      
-      for (const [index, chunk] of chunks.entries()) {
-        const doc = new TfIdfDocument(chunk);
-        $collection.add_document(doc);
+      for (const [index, chunk] of previewData.chunks.entries()) {
+        if ($searchMode === 'tf-idf') {
+          const doc = new TfIdfDocument(chunk.text);
+          $collection.add_document(doc);
+        } else {
+          const doc = new NeuralDocument(chunk.text);
+          $neuralCollection.add_document(doc);
+        }
         
         $uploadStatus.documentsAdded = index + 1;
-        $uploadStatus.message = `Processing chunks: ${index + 1}/${chunks.length}`;
+        $uploadStatus.message = `Processing chunks: ${index + 1}/${previewData.chunks.length}`;
       }
 
       $uploadStatus = {
         isUploading: false,
-        message: `Successfully added ${chunks.length} chunks from ${filename}`,
-        documentsAdded: chunks.length
+        message: `Successfully added ${previewData.chunks.length} chunks from ${previewData.filename}`,
+        documentsAdded: previewData.chunks.length
       };
 
       // Clear preview
@@ -143,7 +139,6 @@
 
 {#if previewData}
   <FilePreview 
-    content={previewData.content}
     chunks={previewData.chunks}
     filename={previewData.filename}
     onConfirm={handleConfirmUpload}

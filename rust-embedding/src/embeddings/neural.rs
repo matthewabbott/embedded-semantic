@@ -102,6 +102,32 @@ impl DocumentCollection for NeuralCollection {
     }
 }
 
+#[wasm_bindgen]
+impl NeuralDocument {
+    #[wasm_bindgen(constructor)]
+    pub fn create(text: String) -> NeuralDocument {
+        Self::new(text)
+    }
+}
+
+#[wasm_bindgen]
+impl NeuralCollection {
+    #[wasm_bindgen(constructor)]
+    pub fn create() -> NeuralCollection {
+        Self::new()
+    }
+
+    #[wasm_bindgen]
+    pub fn add_document(&mut self, doc: NeuralDocument) {
+        DocumentCollection::add_document(self, doc)
+    }
+
+    #[wasm_bindgen]
+    pub fn search(&self, query: String) -> js_sys::Array {
+        DocumentCollection::search(self, query)
+    }
+}
+
 // Helper function for cosine similarity
 fn calculate_cosine_similarity(vec1: &[f32], vec2: &[f32]) -> f32 {
     let dot_product: f32 = vec1.iter()

@@ -1,5 +1,5 @@
 <script>
-  import { collection } from '../lib/store';
+  import { collection, neuralCollection, searchMode } from '../lib/store';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
@@ -7,8 +7,10 @@
   let searchText = '';
 
   function handleSearch() {
-    if (searchText && $collection) {
-      const results = $collection.search(searchText);
+    if (searchText) {
+      const results = $searchMode === 'tf-idf' 
+        ? $collection.search(searchText)
+        : $neuralCollection.search(searchText);
       dispatch('search', Array.from(results).sort((a, b) => b.score - a.score));
     }
   }

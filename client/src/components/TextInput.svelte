@@ -1,13 +1,18 @@
 <script>
-  import { collection } from '../lib/store';
-  import { TfIdfDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
+  import { collection, neuralCollection, searchMode } from '../lib/store';
+  import { TfIdfDocument, NeuralDocument } from '../../../rust-embedding/pkg/rust_embedding.js';
 
   let inputText = '';
 
   function handleAddDocument() {
     if (inputText) {
-      const doc = new TfIdfDocument(inputText);
-      $collection.add_document(doc);
+      if ($searchMode === 'tf-idf') {
+        const doc = new TfIdfDocument(inputText);
+        $collection.add_document(doc);
+      } else {
+        const doc = new NeuralDocument(inputText);
+        $neuralCollection.add_document(doc);
+      }
       inputText = '';
     }
   }

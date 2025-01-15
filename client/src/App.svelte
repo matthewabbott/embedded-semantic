@@ -1,37 +1,47 @@
 <script>
-  import init, { TfIdfCollection } from '../../rust-embedding/pkg/rust_embedding.js';
+  import init, { TfIdfCollection, NeuralCollection } from '../../rust-embedding/pkg/rust_embedding.js';
   import { onMount } from 'svelte';
-  import { collection } from './lib/store';
+  import { collection, neuralCollection, searchMode } from './lib/store';
   import FileUpload from './components/FileUpload.svelte';
   import TextInput from './components/TextInput.svelte';
   import SearchBox from './components/SearchBox.svelte';
   import SearchResults from './components/SearchResults.svelte';
 
-  let searchResults = [];
   let isLoaded = false;
 
   onMount(async () => {
     await init();
     $collection = new TfIdfCollection();
+    $neuralCollection = new NeuralCollection();
     isLoaded = true;
   });
-
-  function handleSearchResults(event) {
-    searchResults = event.detail;
-  }
 </script>
 
 <main>
-  <h1>Semantic Search Demo (TF-IDF)</h1>
+  <h1>Semantic Search Demo</h1>
   
   {#if isLoaded}
-    <div>
-      <h2>Add Content</h2>
-      <TextInput />
-      <FileUpload />
-      <SearchBox on:search={handleSearchResults} />
-      <SearchResults results={searchResults} />
+    <div class="mode-selector">
+      <label>
+        <input 
+          type="radio" 
+          bind:group={$searchMode} 
+          value="tf-idf"
+        > TF-IDF
+      </label>
+      <label>
+        <input 
+          type="radio" 
+          bind:group={$searchMode} 
+          value="neural"
+        > Neural
+      </label>
     </div>
+
+    <TextInput />
+    <FileUpload />
+    <SearchBox />
+    <SearchResults />
   {:else}
     <p>Loading WASM module...</p>
   {/if}
