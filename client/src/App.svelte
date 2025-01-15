@@ -8,6 +8,7 @@
   import SearchResults from './components/SearchResults.svelte';
 
   let isLoaded = false;
+  let searchResults = [];
 
   onMount(async () => {
     await init();
@@ -15,6 +16,11 @@
     $neuralCollection = new NeuralCollection();
     isLoaded = true;
   });
+  
+  function handleSearch(event) {
+    searchResults = event.detail;
+    console.log('Search results:', searchResults);  // Debug log
+  }
 </script>
 
 <main>
@@ -40,8 +46,8 @@
 
     <TextInput />
     <FileUpload />
-    <SearchBox />
-    <SearchResults />
+    <SearchBox on:search={handleSearch} />
+    <SearchResults results={searchResults} />
   {:else}
     <p>Loading WASM module...</p>
   {/if}

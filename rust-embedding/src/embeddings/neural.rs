@@ -82,15 +82,13 @@ impl DocumentCollection for NeuralCollection {
     }
 
     fn search(&self, query: String) -> js_sys::Array {
-        // Create a dummy query embedding
-        let query_embedding = vec![0.0; 384];
+        let query_doc = NeuralDocument::new(query);
+        let query_embedding = query_doc.get_dense_vector();
         
-        // Calculate cosine similarities
         let results = js_sys::Array::new();
         
         for doc in &self.documents {
-            // Calculate cosine similarity between embeddings
-            let similarity = calculate_cosine_similarity(&query_embedding, &doc.embedding);
+            let similarity = calculate_cosine_similarity(query_embedding, doc.get_dense_vector());
             
             let result = js_sys::Object::new();
             js_sys::Reflect::set(&result, &"text".into(), &doc.text.clone().into()).unwrap();

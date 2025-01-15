@@ -8,9 +8,11 @@
 
   function handleSearch() {
     if (searchText) {
+      console.log('Searching with mode:', $searchMode);  // Debug log
       const results = $searchMode === 'tf-idf' 
         ? $collection.search(searchText)
         : $neuralCollection.search(searchText);
+      console.log('Got results:', results);  // Debug log
       dispatch('search', Array.from(results).sort((a, b) => b.score - a.score));
     }
   }
